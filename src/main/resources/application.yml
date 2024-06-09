@@ -24,6 +24,9 @@ spring:
         smtp.timeout: 50000
         smtp.starttls.enable: true
   data:
+    web:
+      pageable:
+        default-page-size: 10
     redis:
       mail:
         host: localhost
