@@ -2,7 +2,6 @@ package december.spring.studywithme.dto;
 
 import december.spring.studywithme.entity.Post;
 import lombok.Getter;
-
 import java.time.LocalDateTime;
 
 @Getter
@@ -19,5 +18,12 @@ public class PostResponseDTO {
         this.contents = post.getContents();
         this.createdAt = post.getCreatedAt();
         this.modifiedAt = post.getModifiedAt();
+    }
+
+    public PostResponseDTO(String title, String contents, LocalDateTime createdAt, LocalDateTime modifiedAt) {
+        this.title = title;
+        this.contents = contents;
+        this.createdAt = createdAt;
+        this.modifiedAt = modifiedAt;
     }
 }
