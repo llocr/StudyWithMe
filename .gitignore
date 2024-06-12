@@ -1,3 +1,5 @@
+.jqwik-database
+
 #env.properties 설정
 /src/main/resources/properties/env.properties
 /src/main/java/december/spring/studywithme/config/PropertyConfig.java
