@@ -17,7 +17,7 @@ import december.spring.studywithme.exception.UserException;
 import december.spring.studywithme.repository.UserRepository;
 
 @SpringBootTest
-class UserServiceTest {
+class UserServiceTest { // 프로젝트 때 만든 테스트 코드
 	@Autowired
 	UserService userService;
 	@Autowired
