@@ -1,16 +1,29 @@
 package december.spring.studywithme.controller;
 
-import december.spring.studywithme.dto.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import december.spring.studywithme.dto.EditPasswordRequestDTO;
+import december.spring.studywithme.dto.PasswordRequestDTO;
+import december.spring.studywithme.dto.ResponseMessage;
+import december.spring.studywithme.dto.UserProfileResponseDTO;
+import december.spring.studywithme.dto.UserProfileRequestDTO;
+import december.spring.studywithme.dto.UserRequestDTO;
+import december.spring.studywithme.dto.UserResponseDTO;
 import december.spring.studywithme.jwt.JwtUtil;
 import december.spring.studywithme.security.UserDetailsImpl;
 import december.spring.studywithme.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -119,7 +132,7 @@ public class UserController {
 	 */
 	@GetMapping("/mypage")
 	public ResponseEntity<ResponseMessage<UserProfileResponseDTO>> userProfile(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		UserProfileResponseDTO responseDTO = userService.inquiryUser(userDetails.getUsername());
+		UserProfileResponseDTO responseDTO = userService.inquiryUser(userDetails.getUser());
 		
 		ResponseMessage<UserProfileResponseDTO> responseMessage = ResponseMessage.<UserProfileResponseDTO>builder()
 			.statusCode(HttpStatus.OK.value())
@@ -140,7 +153,7 @@ public class UserController {
 	 * 	   - 데이터: 수정된 사용자의 정보를 담고 있는 UserResponseDTO 객체
 	 */
 	@PutMapping("/mypage")
-	public ResponseEntity<ResponseMessage<UserResponseDTO>> updateUser(@RequestBody UserProfileUpdateRequestDTO requestDTO,
+	public ResponseEntity<ResponseMessage<UserResponseDTO>> updateUser(@RequestBody UserProfileRequestDTO requestDTO,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
 		UserResponseDTO userResponseDTO = userService.editProfile(requestDTO, userDetails.getUser());
 		

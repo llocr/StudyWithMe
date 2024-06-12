@@ -1,10 +1,10 @@
 package december.spring.studywithme.repository;
 
-import december.spring.studywithme.entity.Comment;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-import java.util.Optional;
+import december.spring.studywithme.entity.Comment;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 

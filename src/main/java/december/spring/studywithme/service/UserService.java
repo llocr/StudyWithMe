@@ -120,18 +120,17 @@ public class UserService {
     
     /**
      * 5. 회원 조회 (유저 아이디)
-     * @param userId 조회할 회원의 ID
+     * @param user 로그인한 사용자의 세부 정보
      * @return UserProfileResponseDTO 회원 조회 결과
      */
-    public UserProfileResponseDTO inquiryUser(String userId) {
-        User user = userRepository.findByUserId(userId).orElseThrow(() -> new UserException("해당 유저를 찾을 수 없습니다."));
+    public UserProfileResponseDTO inquiryUser(User user) {
         return new UserProfileResponseDTO(user);
     }
     
     /**
      * 6. 회원 조회 (pk값)
-     * @param Id
-     * @return
+     * @param Id 조회할 회원의 ID
+     * @return UserResponseDTO 회원 조회 결과
      */
     public UserResponseDTO inquiryUserById(Long Id) {
         User user = userRepository.findById(Id)
@@ -146,7 +145,7 @@ public class UserService {
      * @return UserResponseDTO 회원 프로필 수정 결과
      */
     @Transactional // 변경할 필드만 수정하고 바꾸지 않은 필드는 기존 데이터를 유지하는 메서드
-    public UserResponseDTO editProfile(UserProfileUpdateRequestDTO requestDTO, User user) {
+    public UserResponseDTO editProfile(UserProfileRequestDTO requestDTO, User user) {
         if (!passwordEncoder.matches(requestDTO.getCurrentPassword(), user.getPassword())) {
             throw new UserException("비밀번호가 일치하지 않습니다.");
         }
