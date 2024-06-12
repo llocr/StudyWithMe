@@ -9,5 +9,5 @@ class StudyWithMeApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-	
+	// 커밋 테스트
 }
