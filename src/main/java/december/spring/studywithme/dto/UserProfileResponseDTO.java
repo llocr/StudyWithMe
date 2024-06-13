@@ -5,8 +5,6 @@ import lombok.Getter;
 
 @Getter
 public class UserProfileResponseDTO {
-
-
     private Long id;
 
     private String userId;
