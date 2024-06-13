@@ -2,11 +2,14 @@ package december.spring.studywithme.dto;
 
 import december.spring.studywithme.entity.Post;
 import lombok.Getter;
+import lombok.Setter;
+
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 @Getter
+@Setter
 public class PostPageResponseDTO {
     private Integer currentPage;
     private Long totalElements;
