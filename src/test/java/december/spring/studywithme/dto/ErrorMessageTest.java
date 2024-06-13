@@ -1,5 +1,6 @@
 package december.spring.studywithme.dto;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.assertj.core.api.Assertions;
@@ -22,8 +23,8 @@ class ErrorMessageTest {
 			.build();
 		
 	    //then
-		Assertions.assertThat(errorMessage.getStatusCode()).isEqualTo(statusCode);
-		Assertions.assertThat(errorMessage.getMessage()).isEqualTo(message);
+		assertThat(errorMessage.getStatusCode()).isEqualTo(statusCode);
+		assertThat(errorMessage.getMessage()).isEqualTo(message);
 	}
 	
 }

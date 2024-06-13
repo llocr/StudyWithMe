@@ -1,6 +1,7 @@
 package december.spring.studywithme.dto;
 
-import org.assertj.core.api.Assertions;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +19,7 @@ class EditPasswordRequestDTOTest {
 		editPasswordRequestDTO.setNewPassword(newPassword);
 		
 	    //then
-		Assertions.assertThat(editPasswordRequestDTO.getCurrentPassword()).isEqualTo(currentPassword);
-		Assertions.assertThat(editPasswordRequestDTO.getNewPassword()).isEqualTo(newPassword);
+		assertThat(editPasswordRequestDTO.getCurrentPassword()).isEqualTo(currentPassword);
+		assertThat(editPasswordRequestDTO.getNewPassword()).isEqualTo(newPassword);
 	}
 }
