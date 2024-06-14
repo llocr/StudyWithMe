@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 
 import december.spring.studywithme.dto.ResponseMessage;
 import december.spring.studywithme.dto.UserResponseDTO;
+import december.spring.studywithme.entity.User;
 import december.spring.studywithme.utils.MonkeyUtils;
 
 class ResponseMessageTest {
@@ -16,7 +17,13 @@ class ResponseMessageTest {
 	    //given
 	    Integer status = HttpStatus.OK.value();
 		String message = "test";
-		UserResponseDTO data = MonkeyUtils.commonMonkey().giveMeOne(UserResponseDTO.class);
+		User user = User.builder()
+			.userId("testtest")
+			.name("test")
+			.email("sdsdd@gmail.com")
+			.introduce("test")
+			.build();
+		UserResponseDTO data = new UserResponseDTO(user);
 		
 	    //when
 		ResponseMessage<UserResponseDTO> responseMessage = ResponseMessage.<UserResponseDTO>builder()
