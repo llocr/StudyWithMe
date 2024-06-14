@@ -178,7 +178,7 @@ public class UserController {
 	@PutMapping("/password")
 	public ResponseEntity<ResponseMessage<UserResponseDTO>> updatePassword(@Valid @RequestBody EditPasswordRequestDTO requestDTO,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		UserResponseDTO userResponseDTO = userService.editPassword(requestDTO, userDetails);
+		UserResponseDTO userResponseDTO = userService.editPassword(requestDTO, userDetails.getUser());
 		
 		ResponseMessage<UserResponseDTO> responseMessage = ResponseMessage.<UserResponseDTO>builder()
 			.statusCode(HttpStatus.OK.value())

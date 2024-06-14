@@ -6,7 +6,6 @@ import java.util.Optional;
 import december.spring.studywithme.dto.*;
 import december.spring.studywithme.jwt.JwtUtil;
 
-import december.spring.studywithme.security.UserDetailsImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,13 +99,11 @@ public class UserService {
     @Transactional
     public void logout(User user, String accessToken, String refreshToken) {
         
-        if(user==null){
+        if(user == null){
             throw new UserException("로그인되어 있는 유저가 아닙니다.");
         }
         
-        if(user.getUserType().equals(UserType.DEACTIVATED)){
-            throw new UserException("탈퇴한 회원입니다.");
-        }
+        checkUserType(user.getUserType());
         
         User existingUser = userRepository.findByUserId(user.getUserId())
             .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
@@ -161,15 +158,13 @@ public class UserService {
     /**
      * 8. 비밀번호 변경
      * @param requestDTO 비밀번호 변경 요청 데이터
-     * @param userDetails 로그인한 사용자의 세부 정보
+     * @param user 로그인한 사용자의 세부 정보
      * @return UserResponseDTO 비밀번호 변경 결과
      */
     @Transactional
-    public UserResponseDTO editPassword(EditPasswordRequestDTO requestDTO, UserDetailsImpl userDetails) {
-        User user = userDetails.getUser();
-      
+    public UserResponseDTO editPassword(EditPasswordRequestDTO requestDTO, User user) {
         if (!passwordEncoder.matches(requestDTO.getCurrentPassword(), user.getPassword())) {
-            throw new UserException("현재 비밀번호가 일치하지 않습니다.");
+            throw new UserException("현재 비밀번호와 일치하지 않습니다.");
         }
         
         if (passwordEncoder.matches(requestDTO.getNewPassword(), user.getPassword())) {
