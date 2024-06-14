@@ -32,7 +32,7 @@ public class CommentController {
      */
     @PostMapping
     public ResponseEntity<ResponseMessage<CommentResponseDTO>> createComment(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long postId, @Valid @RequestBody CommentRequestDTO requestDto) {
-        CommentResponseDTO responseDto = commentService.createComment(userDetails, postId, requestDto);
+        CommentResponseDTO responseDto = commentService.createComment(userDetails.getUser(), postId, requestDto);
 
         ResponseMessage<CommentResponseDTO> responseMessage = ResponseMessage.<CommentResponseDTO>builder()
                 .statusCode(HttpStatus.CREATED.value())
@@ -100,7 +100,7 @@ public class CommentController {
      */
     @PutMapping("/{commentId}")
     public ResponseEntity<ResponseMessage<CommentResponseDTO>> updateComment(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long postId, @PathVariable Long commentId, @Valid @RequestBody CommentRequestDTO requestDto) {
-        CommentResponseDTO responseDto = commentService.updateComment(userDetails, postId, commentId, requestDto);
+        CommentResponseDTO responseDto = commentService.updateComment(userDetails.getUser(), postId, commentId, requestDto);
 
         ResponseMessage<CommentResponseDTO> responseMessage = ResponseMessage.<CommentResponseDTO>builder()
                 .statusCode(HttpStatus.OK.value())
@@ -123,7 +123,7 @@ public class CommentController {
      */
     @DeleteMapping("/{commentId}")
     public ResponseEntity<ResponseMessage<Long>> deleteComment(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long postId, @PathVariable Long commentId) {
-        commentService.deleteComment(userDetails, postId, commentId);
+        commentService.deleteComment(userDetails.getUser(), postId, commentId);
 
         ResponseMessage<Long> responseMessage = ResponseMessage.<Long>builder()
                 .statusCode(HttpStatus.OK.value())
