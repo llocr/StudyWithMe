@@ -36,7 +36,7 @@ public class PostService {
 	 * @return PostResponseDTO 게시글 생성 결과
 	 */
 	@Transactional
-	public PostResponseDTO createPost(december.spring.studywithme.entity.User user, PostRequestDTO request) {
+	public PostResponseDTO createPost(User user, PostRequestDTO request) {
 		Post post = Post.builder()
 			.title(request.getTitle())
 			.contents(request.getContents())
