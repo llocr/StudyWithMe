@@ -11,10 +11,6 @@ import december.spring.studywithme.entity.User;
 import december.spring.studywithme.utils.MonkeyUtils;
 
 class PostLikeTest {
-	PostLike createPostLike() {
-		return MonkeyUtils.commonMonkey().giveMeOne(PostLike.class);
-	}
-	
 	@Test
 	@DisplayName("게시글 좋아요 생성 테스트")
 	void 게시글좋아요생성() {

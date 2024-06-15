@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import december.spring.studywithme.dto.ResponseMessage;
 import december.spring.studywithme.dto.UserResponseDTO;
 import december.spring.studywithme.entity.User;
-import december.spring.studywithme.utils.MonkeyUtils;
 
 class ResponseMessageTest {
 	@Test
