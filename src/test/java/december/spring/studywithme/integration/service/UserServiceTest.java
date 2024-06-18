@@ -3,10 +3,13 @@ package december.spring.studywithme.integration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +26,9 @@ import december.spring.studywithme.repository.UserRepository;
 import december.spring.studywithme.service.UserService;
 import december.spring.studywithme.utils.MonkeyUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @SpringBootTest
 @Transactional
 @ActiveProfiles("test")
@@ -32,15 +38,51 @@ class UserServiceTest {
 	
 	@Autowired
 	private UserRepository userRepository;
-	
-	void createUsers() {
-		UserRequestDTO user = new UserRequestDTO();
-		user.setUserId("test1212");
-		user.setName("test");
-		user.setPassword("test");
-		user.setEmail("test1212@gmail.com");
-		user.setIntroduce("test");
-		userService.createUser(user);
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+	static Long user1Id;
+	static Long user2Id;
+	static Long user3Id;
+
+	@BeforeEach
+	void setUp() {
+		User user1 = User.builder()
+				.userId("test1")
+				.password(passwordEncoder.encode("testtest12!"))
+				.name("test1")
+				.introduce("안녕하세요.")
+				.email("1234@gmail.com")
+				.userType(UserType.UNVERIFIED)
+				.build();
+
+		User user2 = User.builder()
+				.userId("test2")
+				.password(passwordEncoder.encode("testtest12!"))
+				.name("test2")
+				.introduce("안녕하세요.")
+				.email("12345@gmail.com")
+				.userType(UserType.ACTIVE)
+				.build();
+
+		User user3 = User.builder()
+				.userId("test3")
+				.password(passwordEncoder.encode("testtest12!"))
+				.name("test3")
+				.introduce("안녕하세요.")
+				.email("123456@gmail.com")
+				.userType(UserType.DEACTIVATED)
+				.build();
+
+
+		User saveUser1 = userRepository.save(user1);
+		User saveUser2 = userRepository.save(user2);
+		User saveUser3 = userRepository.save(user3);
+
+		user1Id = saveUser1.getId();
+		user2Id = saveUser2.getId();
+		user3Id = saveUser3.getId();
 	}
 	
 	@Test
@@ -69,7 +111,7 @@ class UserServiceTest {
 	void 유저생성실패_중복된아이디() {
 	    //given
 	    UserRequestDTO requestDTO = MonkeyUtils.commonMonkey().giveMeOne(UserRequestDTO.class);
-		requestDTO.setUserId("test");
+		requestDTO.setUserId("test1");
 		
 	    //when
 	    assertThatThrownBy(() -> userService.createUser(requestDTO))
@@ -82,7 +124,7 @@ class UserServiceTest {
 	void 유저생성실패_중복된이메일() {
 	    //given
 		UserRequestDTO requestDTO = MonkeyUtils.commonMonkey().giveMeOne(UserRequestDTO.class);
-		requestDTO.setEmail("test@gmail.com");
+		requestDTO.setEmail("1234@gmail.com");
 		
 	    //when - then
 		assertThatThrownBy(() -> userService.createUser(requestDTO))
@@ -93,7 +135,7 @@ class UserServiceTest {
 	@DisplayName("유저 활성화 테스트")
 	void 유저활성화() {
 	    //given
-		User user = userRepository.findById(1L).orElseThrow();
+		User user = userRepository.findById(user1Id).orElseThrow();
 		
 	    //when
 		userService.updateUserActive(user);
@@ -106,9 +148,9 @@ class UserServiceTest {
 	@DisplayName("유저 탈퇴 성공")
 	void 유저탈퇴성공() {
 	    //given
-		User user = userRepository.findById(4L).orElseThrow();
+		User user = userRepository.findById(user1Id).orElseThrow();
 		PasswordRequestDTO requestDTO = new PasswordRequestDTO();
-		requestDTO.setPassword("test");
+		requestDTO.setPassword("testtest12!");
 		
 	    //when
 		String userId = userService.withdrawUser(requestDTO, user);
@@ -122,9 +164,9 @@ class UserServiceTest {
 	@DisplayName("유저 탈퇴 실패 - 이미 탈퇴된 회원")
 	void 유저탈퇴실패_이미탈퇴된회원() {
 	    //given
-	    User user = userRepository.findById(2L).orElseThrow();
+	    User user = userRepository.findById(user3Id).orElseThrow();
 		PasswordRequestDTO requestDTO = new PasswordRequestDTO();
-		requestDTO.setPassword("test");
+		requestDTO.setPassword("testtest12!");
 		
 	    //when - then
 		assertThatThrownBy(() -> userService.withdrawUser(requestDTO, user)
@@ -135,7 +177,7 @@ class UserServiceTest {
 	@DisplayName("유저 탈퇴 실패 - 비밀번호 불일치")
 	void 유저탈퇴실패_비밀번호불일치() {
 	    //given
-		User user = userRepository.findById(1L).orElseThrow();
+		User user = userRepository.findById(user1Id).orElseThrow();
 		PasswordRequestDTO requestDTO = new PasswordRequestDTO();
 		requestDTO.setPassword("test");
 		
@@ -148,7 +190,7 @@ class UserServiceTest {
 	@DisplayName("로그아웃 성공")
 	void 로그아웃성공() {
 	    //given
-	    User user = userRepository.findById(1L).orElseThrow();
+	    User user = userRepository.findById(user1Id).orElseThrow();
 		String accessToken = "accessToken";
 		String refreshToken = "refreshToken";
 		
@@ -176,7 +218,7 @@ class UserServiceTest {
 	@DisplayName("로그아웃 실패 - 이미 탈퇴한 회원")
 	void 로그아웃실패_이미탈퇴한회원() {
 	    //given
-	    User user = userRepository.findById(2L).orElseThrow();
+	    User user = userRepository.findById(user3Id).orElseThrow();
 		String accessToken = "accessToken";
 		String refreshToken = "refreshToken";
 		
@@ -189,7 +231,7 @@ class UserServiceTest {
 	@DisplayName("로그인한 유저 조회")
 	void 로그인한유저조회() {
 	    //given
-	    User user = userRepository.findById(2L).orElseThrow();
+	    User user = userRepository.findById(user2Id).orElseThrow();
 		
 	    //when
 		UserProfileResponseDTO userProfileResponseDTO = userService.inquiryUser(user);
@@ -204,14 +246,14 @@ class UserServiceTest {
 	@DisplayName("유저 조회 성공")
 	void 유저조회성공() {
 	    //given
-	    Long Id = 2L;
+	    Long Id = user2Id;
 		
 	    //when
 		UserResponseDTO userResponseDTO = userService.inquiryUserById(Id);
 	    
 	    //then
-		assertThat(userResponseDTO.getUserId()).isEqualTo("test");
-		assertThat(userResponseDTO.getName()).isEqualTo("test");
+		assertThat(userResponseDTO.getUserId()).isEqualTo("test2");
+		assertThat(userResponseDTO.getName()).isEqualTo("test2");
 	}
 	
 	@Test
@@ -230,8 +272,8 @@ class UserServiceTest {
 	void 유저프로필수정성공() {
 	    //given
 		UserProfileRequestDTO requestDTO = MonkeyUtils.commonMonkey().giveMeOne(UserProfileRequestDTO.class);
-		requestDTO.setCurrentPassword("test");
-		User user = userRepository.findById(2L).orElseThrow();
+		requestDTO.setCurrentPassword("testtest12!");
+		User user = userRepository.findById(user2Id).orElseThrow();
 		
 	    //when
 		UserResponseDTO userResponseDTO = userService.editProfile(requestDTO, user);
@@ -245,8 +287,8 @@ class UserServiceTest {
 	void 유저프로필수정실패_비밀번호불일치() {
 	    //given
 		UserProfileRequestDTO requestDTO = MonkeyUtils.commonMonkey().giveMeOne(UserProfileRequestDTO.class);
-		requestDTO.setCurrentPassword("test1");
-		User user = userRepository.findById(2L).orElseThrow();
+		requestDTO.setCurrentPassword("testtest12");
+		User user = userRepository.findById(user2Id).orElseThrow();
 	    
 	    //when - then
 		assertThatThrownBy(() -> userService.editProfile(requestDTO, user)
@@ -258,10 +300,10 @@ class UserServiceTest {
 	void 비밀번호변경성공() {
 	    //given
 		EditPasswordRequestDTO requestDTO = new EditPasswordRequestDTO();
-		requestDTO.setCurrentPassword("test");
-		requestDTO.setNewPassword("test1");
+		requestDTO.setCurrentPassword("testtest12!");
+		requestDTO.setNewPassword("hihello123!");
 		
-		User user = userRepository.findById(2L).orElseThrow();
+		User user = userRepository.findById(user2Id).orElseThrow();
 		
 	    //when
 		UserResponseDTO userResponseDTO = userService.editPassword(requestDTO, user);
@@ -275,10 +317,10 @@ class UserServiceTest {
 	void 비밀번호변경실패_비밀번호불일치() {
 	    //given
 		EditPasswordRequestDTO requestDTO = new EditPasswordRequestDTO();
-		requestDTO.setCurrentPassword("test1");
+		requestDTO.setCurrentPassword("testtest12");
 		requestDTO.setNewPassword("test2");
 	 
-		User user = userRepository.findById(2L).orElseThrow();
+		User user = userRepository.findById(user2Id).orElseThrow();
 		
 	    //when - then
 		assertThatThrownBy(() -> userService.editPassword(requestDTO, user))
@@ -290,10 +332,10 @@ class UserServiceTest {
 	void 비밀번호변경실패_새로운비밀번호와기존비밀번호동일() {
 	    //given
 		EditPasswordRequestDTO requestDTO = new EditPasswordRequestDTO();
-		requestDTO.setCurrentPassword("test");
-		requestDTO.setNewPassword("test");
+		requestDTO.setCurrentPassword("testtest12!");
+		requestDTO.setNewPassword("testtest12!");
 		
-		User user = userRepository.findById(2L).orElseThrow();
+		User user = userRepository.findById(user2Id).orElseThrow();
 		
 	    //when - then
 		assertThatThrownBy(() -> userService.editPassword(requestDTO, user)
