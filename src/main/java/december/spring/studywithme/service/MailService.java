@@ -41,7 +41,7 @@ public class MailService {
 	 * @param content 이메일 내용
 	 * @throws MessagingException
 	 */
-	private void sendMail(String email, String content) throws MessagingException {
+	public void sendMail(String email, String content) throws MessagingException {
 		MimeMessage mimeMessage = mailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
 		helper.setTo(email);

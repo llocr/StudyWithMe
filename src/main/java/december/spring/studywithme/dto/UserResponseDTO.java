@@ -3,7 +3,6 @@ package december.spring.studywithme.dto;
 import java.time.LocalDateTime;
 
 import december.spring.studywithme.entity.User;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 

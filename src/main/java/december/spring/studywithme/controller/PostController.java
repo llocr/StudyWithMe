@@ -1,20 +1,26 @@
 package december.spring.studywithme.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import december.spring.studywithme.dto.PostPageResponseDTO;
 import december.spring.studywithme.dto.PostRequestDTO;
 import december.spring.studywithme.dto.PostResponseDTO;
 import december.spring.studywithme.dto.ResponseMessage;
 import december.spring.studywithme.security.UserDetailsImpl;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-
 import december.spring.studywithme.service.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -34,7 +40,7 @@ public class PostController {
      */
     @PostMapping
     public ResponseEntity<ResponseMessage<PostResponseDTO>> createPost(@AuthenticationPrincipal UserDetailsImpl userDetails, @Valid @RequestBody PostRequestDTO request) {
-        PostResponseDTO postResponseDTO = postService.createPost(userDetails, request);
+        PostResponseDTO postResponseDTO = postService.createPost(userDetails.getUser(), request);
 
         ResponseMessage<PostResponseDTO> responseMessage = ResponseMessage.<PostResponseDTO>builder()
                 .statusCode(HttpStatus.CREATED.value())
@@ -107,7 +113,7 @@ public class PostController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<ResponseMessage<PostResponseDTO>> updatePost(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails, @Valid @RequestBody PostRequestDTO requestDto) {
-        PostResponseDTO responseDTO = postService.updatePost(id, userDetails, requestDto);
+        PostResponseDTO responseDTO = postService.updatePost(id, userDetails.getUser(), requestDto);
 
         ResponseMessage<PostResponseDTO> responseMessage = ResponseMessage.<PostResponseDTO>builder()
                 .statusCode(HttpStatus.OK.value())
@@ -130,7 +136,7 @@ public class PostController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseMessage<Long>> deletePost(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        postService.deletePost(id, userDetails);
+        postService.deletePost(id, userDetails.getUser());
 
         ResponseMessage<Long> responseMessage = ResponseMessage.<Long>builder()
                 .statusCode(HttpStatus.OK.value())

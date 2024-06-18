@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,11 +28,11 @@ public class Post extends Timestamped{
 	@Column(nullable = false)
 	private String contents;
 
-	@OneToMany(mappedBy = "post", orphanRemoval = true)
-	private List<Comment> commentList;
+	@OneToMany(mappedBy = "post", orphanRemoval = true, cascade = CascadeType.ALL)
+	private List<Comment> commentList = new ArrayList<>();
 
-	@OneToMany(mappedBy = "post", orphanRemoval = true)
-	private List<PostLike> postLikeList;
+	@OneToMany(mappedBy = "post", orphanRemoval = true, cascade = CascadeType.ALL)
+	private List<PostLike> postLikeList = new ArrayList<>();
 
 	@Column(nullable = false)
 	private Long likes;

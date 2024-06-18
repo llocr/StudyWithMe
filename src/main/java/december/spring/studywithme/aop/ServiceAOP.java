@@ -1,4 +1,4 @@
-package december.spring.studywithme.aspect;
+package december.spring.studywithme.aop;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -7,10 +7,10 @@ import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
-@Slf4j
+@Slf4j(topic = "Service Logging")
 @Aspect
 @Component
-public class LogAspect {
+public class ServiceAOP {
     // 포인트컷 시그니처
     @Pointcut("execution(* december.spring.studywithme..*Service.*(..))")
     public void service() {}

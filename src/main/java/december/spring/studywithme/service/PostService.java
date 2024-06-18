@@ -1,17 +1,10 @@
 package december.spring.studywithme.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
-import december.spring.studywithme.dto.PostPageResponseDTO;
-import december.spring.studywithme.dto.PostRequestDTO;
-import december.spring.studywithme.dto.PostResponseDTO;
-import december.spring.studywithme.entity.Post;
-import december.spring.studywithme.exception.NoContentException;
-import december.spring.studywithme.exception.PageException;
-import december.spring.studywithme.exception.PostException;
-import december.spring.studywithme.repository.PostRepository;
-import december.spring.studywithme.security.UserDetailsImpl;
-import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,11 +12,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.List;
+import december.spring.studywithme.dto.PostPageResponseDTO;
+import december.spring.studywithme.dto.PostRequestDTO;
+import december.spring.studywithme.dto.PostResponseDTO;
+import december.spring.studywithme.entity.Post;
+import december.spring.studywithme.entity.User;
+import december.spring.studywithme.exception.NoContentException;
+import december.spring.studywithme.exception.PageException;
+import december.spring.studywithme.exception.PostException;
+import december.spring.studywithme.repository.PostRepository;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -33,16 +31,16 @@ public class PostService {
 
 	/**
 	 * 1. 게시글 생성
-	 * @param userDetails 로그인한 사용자의 세부 정보
+	 * @param user 로그인한 사용자의 세부 정보
 	 * @param request 게시글 생성 요청 데이터
 	 * @return PostResponseDTO 게시글 생성 결과
 	 */
 	@Transactional
-	public PostResponseDTO createPost(UserDetailsImpl userDetails, PostRequestDTO request) {
+	public PostResponseDTO createPost(User user, PostRequestDTO request) {
 		Post post = Post.builder()
 			.title(request.getTitle())
 			.contents(request.getContents())
-			.user(userDetails.getUser())
+			.user(user)
 			.build();
 
 		Post savePost = postRepository.save(post);
@@ -77,7 +75,7 @@ public class PostService {
 				LocalDateTime finishDate = parseDateString(to, false);
 
 				if (startDate.isAfter(finishDate) || startDate.isEqual(finishDate)) {
-					throw new IllegalArgumentException("기간 설정이 올바르지 않습니다.");
+					throw new PageException("기간 설정이 올바르지 않습니다.");
 				}
 
 				postPage = postRepository.findPostPageByPeriod(startDate, finishDate, pageable);
@@ -92,7 +90,7 @@ public class PostService {
 				postPage = postRepository.findAll(pageable);
 			}
 		} catch (DateTimeParseException e) {
-			throw new IllegalArgumentException("날짜 형식이 올바르지 않습니다. yyyy-mm-dd 형식으로 입력해주세요!");
+			throw new PageException("날짜 형식이 올바르지 않습니다. yyyy-mm-dd 형식으로 입력해주세요.");
 		}
 
 		checkValidatePage(postPage, page);
@@ -102,14 +100,14 @@ public class PostService {
 	/**
 	 * 4. 게시글 수정
 	 * @param id 게시글의 ID
-	 * @param userDetails 로그인한 사용자의 세부 정보
+	 * @param user 로그인한 사용자의 세부 정보
 	 * @param requestDto 게시글 수정 요청 데이터
 	 * @return PostResponseDTO 게시글 수정 결과
 	 */
 	@Transactional
-	public PostResponseDTO updatePost(Long id, UserDetailsImpl userDetails, PostRequestDTO requestDto) {
+	public PostResponseDTO updatePost(Long id, User user, PostRequestDTO requestDto) {
 		Post post = getValidatePost(id);
-		checkPostWriter(post, userDetails);
+		checkPostWriter(post, user);
 
 		// 수정 진행
 		post.update(requestDto);
@@ -121,12 +119,12 @@ public class PostService {
 	/**
 	 * 5. 게시글 삭제
 	 * @param id 게시글의 ID
-	 * @param userDetails 로그인한 사용자의 세부 정보
+	 * @param user 로그인한 사용자의 세부 정보
 	 */
 	@Transactional
-	public void deletePost(Long id, UserDetailsImpl userDetails) {
+	public void deletePost(Long id, User user) {
 		Post post = getValidatePost(id);
-		checkPostWriter(post, userDetails);
+		checkPostWriter(post, user);
 		postRepository.delete(post);
 	}
 
@@ -142,11 +140,12 @@ public class PostService {
 
 	/**
 	 * 게시글 작성자 확인
+	 *
 	 * @param post 게시글
-	 * @param userDetails 로그인한 사용자의 세부 정보
+	 * @param user 로그인한 사용자의 세부 정보
 	 */
-	private void checkPostWriter(Post post, UserDetailsImpl userDetails) {
-		if (!post.getUser().getUserId().equals(userDetails.getUsername())) {
+	private void checkPostWriter(Post post, december.spring.studywithme.entity.User user) {
+		if (!post.getUser().getUserId().equals(user.getUserId())) {
 			throw new PostException("작성자가 아니므로, 접근이 제한됩니다.");
 		}
 	}

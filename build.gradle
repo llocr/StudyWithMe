@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.0'
     id 'io.spring.dependency-management' version '1.1.5'
+    id 'jacoco'
 }
 
 group = 'december.spring'
@@ -22,8 +23,15 @@ repositories {
 }
 
 dependencies {
+    // Fixture Monkey
+    testImplementation 'com.navercorp.fixturemonkey:fixture-monkey-starter:0.6.8'
+    testImplementation 'com.navercorp.fixturemonkey:fixture-monkey-jakarta-validation:0.6.8'
+
+
     //이메일 인증
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     // JWT
@@ -44,8 +52,33 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+}
+
+jacoco {
+    toolVersion = "0.8.7"
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy 'jacocoTestReport'
+}
+
+jacocoTestReport {
+    reports {
+        html.outputLocation = file("${buildDir}/jacocoHtml")
+        xml.required = false
+        csv.required = false
+    }
+    finalizedBy 'jacocoTestCoverageVerification'
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.6
+            }
+        }
+    }
 }
